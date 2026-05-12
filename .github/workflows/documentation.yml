@@ -1,0 +1,29 @@
+# .github/workflows/documentation.yml
+#
+# Regenerates README.md via terraform-docs after each push to main.
+# Uses push trigger (not pull_request) for fork safety — PRs from forks
+# fail with git exit code 1 because the head branch only exists in the fork.
+name: Generate terraform docs
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Render terraform docs inside the README.md and push changes back to branch
+        uses: terraform-docs/gh-actions@v1.4.1
+        with:
+          working-dir: .
+          output-file: README.md
+          output-method: inject
+          git-push: "true"
