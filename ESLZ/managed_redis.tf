@@ -41,7 +41,7 @@ variable "tags" {
 # ── Module block ───────────────────────────────────────────────────────────────
 
 module "managed_redis" {
-  source   = "github.com/canada-ca-terraform-modules/terraform-azurerm-caf-managed-redis?ref=v1.0.0"
+  source   = "github.com/canada-ca-terraform-modules/terraform-azurerm-caf-managed-redis?ref=v1.2.0"
   for_each = var.managed_redis
 
   resource_groups   = var.resource_groups

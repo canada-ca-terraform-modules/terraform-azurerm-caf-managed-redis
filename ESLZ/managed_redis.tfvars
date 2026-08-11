@@ -54,6 +54,9 @@ managed_redis = {
         # ── Optional: high availability (defaults to true; changing forces replace)
         # high_availability_enabled = true
 
+        # ── Optional: public network access (defaults to "Enabled") ────────────
+        # public_network_access = "Disabled"
+
         # ── Optional: default database ────────────────────────────────────────
         # Omit to create the cluster without a database (for troubleshooting only).
         # Note: changing clustering_policy, geo_replication_group_name, or modules
@@ -83,6 +86,11 @@ managed_redis = {
           #   { name = "RedisBloom",      args = "ERROR_RATE 0.00 INITIAL_SIZE 400" },
           #   { name = "RedisTimeSeries" },
           # ]
+
+          # Persistence — only one of the two below may be set, and neither is
+          # compatible with geo_replication_group_name (provider-enforced).
+          # persistence_append_only_file_backup_frequency = "1s"
+          # persistence_redis_database_backup_frequency    = "1h"
         }
 
         # ── Optional: managed identity ─────────────────────────────────────────

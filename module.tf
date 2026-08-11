@@ -12,6 +12,9 @@ resource "azurerm_managed_redis" "instances" {
   # Defaults to true; changing forces a new resource
   high_availability_enabled = try(each.value.high_availability_enabled, true)
 
+  # Defaults to "Enabled" when omitted (provider default)
+  public_network_access = try(each.value.public_network_access, null)
+
   # ── Default Database (optional) ──────────────────────────────────────────────
   # A Managed Redis instance is not functional without a database.
   # This block is intentionally optional to allow removal/re-creation for troubleshooting.
@@ -25,6 +28,11 @@ resource "azurerm_managed_redis" "instances" {
       clustering_policy                  = try(each.value.default_database.clustering_policy, "OSSCluster")
       eviction_policy                    = try(each.value.default_database.eviction_policy, "VolatileLRU")
       geo_replication_group_name         = try(each.value.default_database.geo_replication_group_name, null)
+
+      # Persistence: only one of the two below may be set, and neither is compatible
+      # with geo_replication_group_name (enforced by the provider, not this module).
+      persistence_append_only_file_backup_frequency = try(each.value.default_database.persistence_append_only_file_backup_frequency, null)
+      persistence_redis_database_backup_frequency   = try(each.value.default_database.persistence_redis_database_backup_frequency, null)
 
       # Redis modules: RedisBloom, RedisTimeSeries, RediSearch, RedisJSON
       # Only RediSearch and RedisJSON are allowed with geo-replication
