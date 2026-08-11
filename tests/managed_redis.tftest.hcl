@@ -332,3 +332,95 @@ run "system_assigned_identity" {
     error_message = "Identity type must be SystemAssigned"
   }
 }
+
+# ── public_network_access defaults to null when omitted (azurerm >= 5.0) ──────
+run "public_network_access_default" {
+  command = plan
+
+  variables {
+    managed_redis = {
+      resource_group = "Project"
+      instances = {
+        solo = { sku_name = "Balanced_B3", location = "canadacentral" }
+      }
+    }
+  }
+
+  assert {
+    condition     = azurerm_managed_redis.instances["solo"].public_network_access == null
+    error_message = "public_network_access must be null (provider default) when omitted"
+  }
+}
+
+# ── public_network_access explicit override (azurerm >= 5.0) ──────────────────
+run "public_network_access_disabled" {
+  command = plan
+
+  variables {
+    managed_redis = {
+      resource_group = "Project"
+      instances = {
+        privatenode = {
+          sku_name              = "Balanced_B3"
+          location              = "canadacentral"
+          public_network_access = "Disabled"
+        }
+      }
+    }
+  }
+
+  assert {
+    condition     = azurerm_managed_redis.instances["privatenode"].public_network_access == "Disabled"
+    error_message = "public_network_access must be set to Disabled when configured"
+  }
+}
+
+# ── default_database persistence: AOF backup frequency (azurerm >= 5.0) ───────
+run "database_persistence_aof" {
+  command = plan
+
+  variables {
+    managed_redis = {
+      resource_group = "Project"
+      instances = {
+        aofnode = {
+          sku_name = "Balanced_B3"
+          location = "canadacentral"
+          default_database = {
+            persistence_append_only_file_backup_frequency = "1s"
+          }
+        }
+      }
+    }
+  }
+
+  assert {
+    condition     = azurerm_managed_redis.instances["aofnode"].default_database[0].persistence_append_only_file_backup_frequency == "1s"
+    error_message = "persistence_append_only_file_backup_frequency must be set to 1s when configured"
+  }
+}
+
+# ── default_database persistence: RDB backup frequency (azurerm >= 5.0) ───────
+run "database_persistence_rdb" {
+  command = plan
+
+  variables {
+    managed_redis = {
+      resource_group = "Project"
+      instances = {
+        rdbnode = {
+          sku_name = "Balanced_B3"
+          location = "canadacentral"
+          default_database = {
+            persistence_redis_database_backup_frequency = "1h"
+          }
+        }
+      }
+    }
+  }
+
+  assert {
+    condition     = azurerm_managed_redis.instances["rdbnode"].default_database[0].persistence_redis_database_backup_frequency == "1h"
+    error_message = "persistence_redis_database_backup_frequency must be set to 1h when configured"
+  }
+}
