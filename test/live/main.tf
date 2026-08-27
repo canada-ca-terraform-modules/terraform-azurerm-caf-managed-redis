@@ -1,3 +1,4 @@
+# Triggers the live-test.yml path filter for PR B (workflow-file-only diff).
 terraform {
   required_version = ">= 1.9"
   required_providers {
